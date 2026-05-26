@@ -19,9 +19,16 @@ try {
 }
 
 export function isBlacklisted(fileName: string) {
-    return blacklistedFileNames.includes(fileName);
+    const blacklisted = blacklistedFileNames.includes(fileName);
+
+    if (blacklisted) {
+        logger.debug(`Skip blacklisted channel : "${fileName}"`);
+    }
+
+    return blacklisted;
 }
 
 export function writeBlacklistFile(filename: string) {
+    logger.debug(`Blacklisting: "${filename}"`);
     blacklistedChannelWriteSream.write(`${filename}\n`);
 }

@@ -22,7 +22,7 @@ function getRawArgs(): CLIArguments {
     .option('-i, --image-directory <dir>', 'Image output directory', './img')
     .option('-f, --file-name <name>', 'Markdown file name', 'parent')
     .option('-l, --log <level>', 'Log level', 'info')
-    .option('-w, --waypoint', 'Add obsidian waypoint', 'false')
+    .option('-w, --waypoint', 'Add obsidian waypoint', false)
     .parse(process.argv);
 
     return program.opts() as CLIArguments;
@@ -66,7 +66,7 @@ function validateArgs(args: CLIArguments): CLIArguments {
         imageDirectory: z.string().min(1, 'Minimum 1 character'),
         fileName: z.string().min(1, 'Minimum 1 character'),
         log: z.enum(['info', 'error', 'debug'], 'Invalid value [infor | error | debug]'),
-        waypoint: z.coerce.boolean()
+        waypoint: z.boolean(),
     })
 
     try {
