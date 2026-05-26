@@ -1,5 +1,5 @@
 import { program } from 'commander';
-import { z, ZodError } from 'zod';
+import { z } from 'zod';
 import type { CLIArguments } from '@/types/index.js';
 import { logger } from '@/util/winston.js';
 import { getEnv } from './env.js';
@@ -69,14 +69,6 @@ function validateArgs(args: CLIArguments): CLIArguments {
         waypoint: z.boolean(),
     })
 
-    try {
-        const result = schema.parse(args);
-        return result;
-    } catch (e: unknown) {
-
-        if (e instanceof ZodError) {
-            logger.error(e.issues.map(e => `Argument [${e.path}]: ${e.message}`).toString());
-        }
-        process.exit(0);
-    }
+    const result = schema.parse(args);
+    return result;
 }

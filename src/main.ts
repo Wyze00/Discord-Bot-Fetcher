@@ -9,17 +9,18 @@ import fs from 'fs';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
 import type { CLIArguments } from './types/index.js';
+import { ZodError } from 'zod';
 
 let args: CLIArguments;
 
 async function main() {
-    printBanner();
-    logger.info('Getting arguments')
-    args = getArgs();
-    /** Overwrite winston logger level */
-    logger.level = args.log;
-
     try {
+        printBanner();
+        logger.info('Getting arguments')
+        args = getArgs();
+        /** Overwrite winston logger level */
+        logger.level = args.log;
+
         bot.once('clientReady', async () => {
             logger.info('Login successful');
             try {
@@ -45,6 +46,8 @@ async function main() {
                 } else {
                     logger.error('Error');
                 }
+
+                process.exit(1);
             }
         })
         
@@ -52,10 +55,16 @@ async function main() {
         await bot.login(args.botToken);
 
     } catch (error: unknown) {
-        
+
+        if (error instanceof ZodError) {
+            logger.error(error.issues.map(e => `Argument [${e.path}]: ${e.message}`).toString());
+        }
+
         if (error instanceof DiscordjsError) {
             logger.error(`${error.name}: ${error.message}`)
         }
+
+        process.exit(1);
     }
 }
 
@@ -185,7 +194,7 @@ async function writeFromChannels(categoryName: string, channels: (NonThreadGuild
         const outputChannelDir = path.join(categoryName, channelName);
 
         /** Check if channel is Text so we can fetch every threads */
-        if (channel!.type === ChannelType.GuildText && channel!.name === 'npm') {
+        if (channel!.type === ChannelType.GuildText) {
 
             /** Check if this chnnel is blacklisted */
             if (isBlacklisted(outputChannelDir)) {
