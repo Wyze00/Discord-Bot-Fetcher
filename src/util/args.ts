@@ -1,8 +1,8 @@
 import { program } from 'commander';
 import { z, ZodError } from 'zod';
-import 'dotenv/config';
 import type { CLIArguments } from '@/types/index.js';
 import { logger } from '@/util/winston.js';
+import { getEnv } from './env.js';
 
 export function getArgs(): CLIArguments {
     const args: CLIArguments = getRawArgs();
@@ -48,7 +48,7 @@ function overwriteArgs(args: CLIArguments) {
             envVar = key.toUpperCase();
         }
 
-        const env = process.env[envVar];
+        const env = getEnv(envVar);
 
         if (env !== undefined) {
             args[key] = env;
@@ -57,6 +57,7 @@ function overwriteArgs(args: CLIArguments) {
 }
 
 function validateArgs(args: CLIArguments): CLIArguments {
+    logger.info('Validating arguments');
 
     const schema: z.ZodType<CLIArguments> = z.object({
         botToken: z.string().min(1, 'Minimum 1 character'),
