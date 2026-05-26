@@ -212,7 +212,6 @@ async function writeFromChannels(categoryName: string, channels: (NonThreadGuild
             }
 
             await write(outputChannelDir, channel!);
-            process.exit(0);
         }
     }
 }
@@ -290,7 +289,6 @@ async function write(outputDir: string, channel: TextChannel | AnyThreadChannel)
     }
 
     const fileName = args.fileName === 'parent' ? `${path.basename(outputDir)}.md` : `${args.fileName}.md`;
-    console.log(fileName);
     fs.writeFileSync(path.join(finalOutputDir, fileName), markdownContent);
     logger.info(`Success write to : "${finalOutputDir}"`);
     writeBlacklistFile(outputDir);
